@@ -10,6 +10,7 @@
         .chart-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .controls { margin-bottom: 20px; }
         .controls select, .controls button { margin-right: 10px; padding: 5px; }
+        #impacto { margin-top: 20px; padding: 10px; border: 1px solid #ccc; background: #f9f9f9; }
     </style>
 </head>
 <body>
@@ -17,9 +18,14 @@
     <div class="controls">
         <label for="shock">Selecciona un shock:</label>
         <select id="shock">
-            <option value="fiscal">Política Fiscal Expansiva</option>
-            <option value="monetaria">Política Monetaria Expansiva</option>
-            <option value="externo">Shock Externo</option>
+            <option value="fiscal_exp">Política Fiscal Expansiva</option>
+            <option value="fiscal_con">Política Fiscal Contractiva</option>
+            <option value="monetaria_exp">Política Monetaria Expansiva</option>
+            <option value="monetaria_con">Política Monetaria Contractiva</option>
+            <option value="externo_alza">Aumento en Demanda Externa</option>
+            <option value="externo_caida">Caída en Demanda Externa</option>
+            <option value="oferta_neg">Shock de Oferta Negativo</option>
+            <option value="oferta_pos">Shock de Oferta Positivo</option>
         </select>
         <label for="cambio">Régimen cambiario:</label>
         <select id="cambio">
@@ -36,53 +42,80 @@
         <div id="mercado-agregado"></div>
     </div>
 
+    <div id="impacto"><strong>Impacto:</strong> Selecciona un shock para ver su efecto.</div>
+
     <script>
-        // Función para crear las gráficas iniciales
+        // Crear gráficas iniciales
         function crearGraficas() {
-            // Mercado Monetario
             Plotly.newPlot('mercado-monetario', [
                 { x: [1, 5], y: [5, 1], mode: 'lines', name: 'MD/P', line: {color: 'red'} },
                 { x: [3, 3], y: [0, 6], mode: 'lines', name: 'MS/P', line: {color: 'blue'} }
-            ], { title: 'Mercado Monetario (M/P vs i)', xaxis: {title: 'M/P'}, yaxis: {title: 'i'} });
+            ], { title: 'Mercado Monetario', xaxis: {title: 'M/P'}, yaxis: {title: 'i'} });
 
-            // Mercado de Bienes y Dinero
             Plotly.newPlot('mercado-bienes', [
                 { x: [1, 5], y: [5, 1], mode: 'lines', name: 'IS', line: {color: 'red'} },
                 { x: [1, 5], y: [1, 5], mode: 'lines', name: 'LM', line: {color: 'blue'} }
             ], { title: 'IS-LM', xaxis: {title: 'Q'}, yaxis: {title: 'i'} });
 
-            // Mercado de Divisas
             Plotly.newPlot('mercado-divisas', [
                 { x: [1, 5], y: [1, 5], mode: 'lines', name: 'Oferta', line: {color: 'blue'} },
                 { x: [1, 5], y: [5, 1], mode: 'lines', name: 'Demanda', line: {color: 'red'} }
-            ], { title: 'Mercado de Divisas (ME vs TCN)', xaxis: {title: 'ME'}, yaxis: {title: 'TCN'} });
+            ], { title: 'Mercado de Divisas', xaxis: {title: 'ME'}, yaxis: {title: 'TCN'} });
 
-            // Mercado Agregado
             Plotly.newPlot('mercado-agregado', [
                 { x: [1, 5], y: [5, 1], mode: 'lines', name: 'DA', line: {color: 'red'} },
                 { x: [1, 5], y: [3, 3], mode: 'lines', name: 'OA', line: {color: 'blue'} }
-            ], { title: 'Mercado Agregado (Q vs P)', xaxis: {title: 'Q'}, yaxis: {title: 'P'} });
+            ], { title: 'Mercado Agregado', xaxis: {title: 'Q'}, yaxis: {title: 'P'} });
         }
 
-        // Función para aplicar shocks
+        // Impactos explicativos
+        const impactos = {
+            fiscal_exp: "La política fiscal expansiva aumenta G, desplaza IS a la derecha, sube Y y i. En tipo de cambio flexible, se aprecia la moneda.",
+            fiscal_con: "La política fiscal contractiva reduce G, desplaza IS a la izquierda, baja Y y i. Menor demanda agregada.",
+            monetaria_exp: "La política monetaria expansiva aumenta M, desplaza LM hacia abajo, baja i y sube Y. En tipo de cambio flexible, se deprecia la moneda.",
+            monetaria_con: "La política monetaria contractiva reduce M, desplaza LM hacia arriba, sube i y baja Y.",
+            externo_alza: "Aumento en demanda externa mejora NX, IS se desplaza a la derecha, sube Y. Tipo de cambio se aprecia.",
+            externo_caida: "Caída en demanda externa reduce NX, IS se desplaza a la izquierda, baja Y. Tipo de cambio se deprecia.",
+            oferta_neg: "Shock de oferta negativo reduce OA, suben precios y baja producción.",
+            oferta_pos: "Shock de oferta positivo aumenta OA, bajan precios y sube producción."
+        };
+
+        // Función para aplicar shocks con animación
         function aplicarShock() {
             const shock = document.getElementById('shock').value;
-            const cambio = document.getElementById('cambio').value;
 
-            if (shock === 'fiscal') {
-                // Mover IS a la derecha
-                Plotly.restyle('mercado-bienes', { x: [[2, 6]], y: [[5, 1]] }, [0]);
-            } else if (shock === 'monetaria') {
-                // Mover LM hacia abajo
-                Plotly.restyle('mercado-bienes', { x: [[1, 5]], y: [[0.5, 4.5]] }, [1]);
-                // Aumentar MS en mercado monetario
-                Plotly.restyle('mercado-monetario', { x: [[4, 4]] }, [1]);
-            } else if (shock === 'externo') {
-                // Ajustar mercado de divisas
-                Plotly.restyle('mercado-divisas', { y: [[6, 2]] }, [1]);
+            switch(shock) {
+                case 'fiscal_exp':
+                    Plotly.animate('mercado-bienes', { data: [{x:[2,6], y:[5,1]}] }, {transition:{duration:1000}, frame:{duration:1000}});
+                    break;
+                case 'fiscal_con':
+                    Plotly.animate('mercado-bienes', { data: [{x:[0.5,4.5], y:[5,1]}] }, {transition:{duration:1000}, frame:{duration:1000}});
+                    break;
+                case 'monetaria_exp':
+                    Plotly.animate('mercado-bienes', { data: [{}, {x:[1,5], y:[0.5,4.5]}] }, {transition:{duration:1000}});
+                    Plotly.animate('mercado-monetario', { data: [{}, {x:[4,4]}] }, {transition:{duration:1000}});
+                    break;
+                case 'monetaria_con':
+                    Plotly.animate('mercado-bienes', { data: [{}, {x:[1,5], y:[1.5,5.5]}] }, {transition:{duration:1000}});
+                    Plotly.animate('mercado-monetario', { data: [{}, {x:[2,2]}] }, {transition:{duration:1000}});
+                    break;
+                case 'externo_alza':
+                    Plotly.animate('mercado-bienes', { data: [{x:[2,6], y:[5,1]}] }, {transition:{duration:1000}});
+                    Plotly.animate('mercado-divisas', { data: [{}, {y:[4,0.5]}] }, {transition:{duration:1000}});
+                    break;
+                case 'externo_caida':
+                    Plotly.animate('mercado-bienes', { data: [{x:[0.5,4.5], y:[5,1]}] }, {transition:{duration:1000}});
+                    Plotly.animate('mercado-divisas', { data: [{}, {y:[6,2]}] }, {transition:{duration:1000}});
+                    break;
+                case 'oferta_neg':
+                    Plotly.animate('mercado-agregado', { data: [{}, {y:[4,4]}] }, {transition:{duration:1000}});
+                    break;
+                case 'oferta_pos':
+                    Plotly.animate('mercado-agregado', { data: [{}, {y:[2,2]}] }, {transition:{duration:1000}});
+                    break;
             }
 
-            alert(`Shock aplicado: ${shock} con régimen ${cambio}`);
+            document.getElementById('impacto').innerHTML = `<strong>Impacto:</strong> ${impactos[shock]}`;
         }
 
         crearGraficas();
