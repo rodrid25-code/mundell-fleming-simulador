@@ -1,0 +1,68 @@
+:root {
+  --bg: #0b0f14;
+  --fg: #e8eef5;
+  --muted: #aab6c3;
+  --blue: #4ea1ff;
+  --green: #49dcb1;
+  --orange: #ffb347;
+  --pink: #ff6fae;
+  --card: #111823;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #1f2937;
+}
+header h1 { margin: 0 0 .25rem 0; font-size: 1.4rem; }
+
+.controls { padding: 1rem 1.25rem; border-bottom: 1px solid #1f2937; }
+.controls .row {
+  display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;
+  margin-bottom: .75rem;
+}
+.controls label { color: var(--muted); font-size: .95rem; }
+.controls input[type="range"] { width: 220px; vertical-align: middle; }
+.controls span { margin-left: .5rem; color: var(--fg); }
+.controls details { margin-top: .5rem; background: var(--card); padding: .75rem; border-radius: 8px; }
+.controls .grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap: .75rem 1rem;
+  margin-top: .6rem;
+}
+.hidden { display: none; }
+button#reset, button#undo {
+  background: #233043; color: var(--fg); border: 1px solid #2f3e53;
+  padding: .5rem .75rem; border-radius: 6px; cursor: pointer;
+}
+button#reset:hover, button#undo:hover { background: #2a3b53; }
+
+.plots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px,1fr));
+  gap: 1rem; padding: 1rem 1.25rem;
+}
+.plot {
+  background: var(--card); border-radius: 10px; padding: .5rem;
+  box-shadow: 0 0 0 1px #1f2937 inset;
+}
+.plot h3 { margin: .5rem .5rem 0 .5rem; color: var(--muted); font-weight: 600; }
+#plot_main, #plot_money, #plot_fx, #plot_nx { width: 100%; height: 360px; }
+
+/* ---- Botones de shocks ---- */
+.btn-group { display: flex; flex-direction: column; gap: .5rem; margin-top: .5rem; }
+.btn-row { display: flex; flex-wrap: wrap; gap: .5rem; }
+.btn {
+  background: #1a2535; color: var(--fg); border: 1px solid #304257;
+  padding: .45rem .6rem; border-radius: 6px; cursor: pointer; font-size: .92rem;
+}
+.btn:hover { background: #213149; }
+.hint { color: var(--muted); display: block; margin-top: .45rem; }
