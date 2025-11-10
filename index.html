@@ -2,17 +2,15 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <title>Simulador Mundell–Fleming</title>
+  <title>Mundell–Fleming 2×2 – Estática comparada</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- CSS -->
-  <link rel="stylesheet" href="styles.css" />
-  <!-- Plotly -->
+  <link href="styles.css" rel="stylesheet" />
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 </head>
 <body>
   <header>
-    <h1>Mundell–Fleming Interactivo</h1>
-    <p>Practica shocks y políticas: IS–LM–BP, dinero, divisas y NX.</p>
+    <h1>Mundell–Fleming 2×2 – Estática comparada</h1>
+    <p>Parte de un equilibrio base (punteado) y compara el nuevo equilibrio (sólido) tras shocks.</p>
   </header>
 
   <section class="controls">
@@ -24,11 +22,15 @@
         </select>
       </label>
       <label id="ebox" class="hidden">e (fijo): <input id="e_bar" type="number" step="0.1" value="100"></label>
+
       <label>Animar desplazamientos:
         <input id="animate" type="checkbox" checked />
       </label>
-      <button id="reset">Reset</button>
+
+      <button id="fix_base" title="Fija el estado actual como BASE para comparar">Fijar como base</button>
+      <button id="clear_base" title="Elimina la base guardada">Limpiar base</button>
       <button id="undo" title="Deshacer el último shock">Deshacer</button>
+      <button id="reset">Reset</button>
     </div>
 
     <details open>
@@ -66,7 +68,6 @@
       </div>
     </details>
 
-    <!-- ============= Shocks predefinidos ============= -->
     <details open>
       <summary><strong>Shocks predefinidos</strong></summary>
       <div class="btn-group">
@@ -90,36 +91,43 @@
         </div>
       </div>
       <small class="hint">
-        Nota: en <em>tipo de cambio fijo</em>, el Banco Central ajusta <strong>M</strong> endógeno para sostener ē. Por eso, “Monetaria expansiva/contractiva” sobre el slider M no tendrá efecto directo en ese régimen.
+        En <em>tipo de cambio fijo</em> el BC ajusta <strong>M</strong> endógeno para sostener ē, por eso “Monetaria” no actúa vía el slider M.
       </small>
     </details>
-    <!-- =============================================== -->
+
+    <details>
+      <summary><strong>AD–AS (parámetros de oferta)</strong></summary>
+      <div class="grid">
+        <label>γ (pendiente AS): <input id="gammaAS" type="range" min="0.1" max="5" step="0.1" value="1.5"><span id="gammaAS_val">1.5</span></label>
+        <label>Y<sub>pot</sub>: <input id="Ypot" type="range" min="50" max="400" step="1" value="150"><span id="Ypot_val">150</span></label>
+      </div>
+      <small class="hint">AS: <code>Y = Y_pot + γ*(P - P^e)</code> con expectativas <code>P^e</code> fijadas al <strong>P</strong> de la base cuando haces “Fijar como base”.</small>
+    </details>
   </section>
 
-  <main class="plots">
+  <main class="plots grid-2x2">
     <div class="plot">
-      <h3>IS–LM–BP (Y, i)</h3>
-      <div id="plot_main"></div>
+      <h3>1) Divisas (S/D de FC): e vs Q<sub>fx</sub></h3>
+      <div id="plot_fx_sd"></div>
     </div>
     <div class="plot">
-      <h3>Mercado de dinero</h3>
-      <div id="plot_money"></div>
+      <h3>2) BP en (Y, i)</h3>
+      <div id="plot_bp"></div>
     </div>
     <div class="plot">
-      <h3>Divisas (Exceso demanda vs e)</h3>
-      <div id="plot_fx"></div>
+      <h3>3) AD–AS (P, Y)</h3>
+      <div id="plot_adas"></div>
     </div>
     <div class="plot">
-      <h3>NX(e) al Y de equilibrio</h3>
-      <div id="plot_nx"></div>
+      <h3>4) IS–LM (Y, i)</h3>
+      <div id="plot_islm"></div>
     </div>
   </main>
 
   <footer>
-    <small>Modelo linealizado de Mundell–Fleming con movilidad de capitales y prima de riesgo. Uso educativo.</small>
+    <small>Mundell–Fleming linealizado. Uso educativo. 2×2 para practicar estática comparada (base vs shock).</small>
   </footer>
 
-  <!-- App -->
   <script src="app.js"></script>
 </body>
 </html>
